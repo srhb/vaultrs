@@ -81,8 +81,10 @@ impl Client for VaultClient {
 impl VaultClient {
     /// Creates a new [VaultClient] using the given [VaultClientSettings].
     #[instrument(skip(settings), err)]
-    pub fn new(settings: VaultClientSettings) -> Result<VaultClient, ClientError> {
+    pub fn new(settings: VaultClientSettings, client_builder_transform: fn(reqwest::ClientBuilder) -> reqwest::ClientBuilder) -> Result<VaultClient, ClientError> {
         let mut http_client = reqwest::ClientBuilder::new();
+        //
+        http_client = client_builder_transform(http_client);
 
         // Optionally set timeout on client
         http_client = if let Some(timeout) = settings.timeout {

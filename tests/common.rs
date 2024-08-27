@@ -134,6 +134,7 @@ impl VaultServerHelper for VaultServer {
                 .token(self.token.clone())
                 .build()
                 .unwrap(),
+            std::convert::identity,
         )
         .unwrap()
     }
