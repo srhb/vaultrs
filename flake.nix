@@ -3,29 +3,15 @@
   inputs = {
     ## Nixpkgs ##
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-
-    ## Std ##
-    std.url = "github:divnix/std";
-    std.inputs.nixpkgs.follows = "nixpkgs";
-
-    # Rust overlay
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = {std, ...} @ inputs:
-    std.growOn
-    {
-      inherit inputs;
-      cellsFrom = ./nix;
-
-      cellBlocks = [
-        (std.blockTypes.devshells "devshells")
-        (std.blockTypes.functions "toolchains")
-        (std.blockTypes.nixago "configs")
+  outputs = inputs@{nixpkgs, ...}: {
+    devShells.x86_64-linux.default = let pkgs = import nixpkgs { system = "x86_64-linux"; }; in pkgs.mkShell {
+      packages = with pkgs; [
+        cargo
+        rustc
+        rust-analyzer
       ];
-    }
-    {
-      devShells = std.harvest inputs.self ["automation" "devshells"];
     };
+  };
 }
